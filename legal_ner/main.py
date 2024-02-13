@@ -83,7 +83,14 @@ if __name__ == "__main__":
         default="default",
         required=False,
         type=str,
-    )    
+    )
+    parser.add_argument(
+        "--models",
+        help="all for all models, luke for just luke",
+        default="all",
+        required=False,
+        type=str,
+    )     
 
     args = parser.parse_args()
 
@@ -157,18 +164,24 @@ if __name__ == "__main__":
             * results["exact"]["recall"]
             / (results["exact"]["precision"] + results["exact"]["recall"] + 1e-9),
         }
-
+    
+    if args.models == "all":
     ## Define the models
-    model_paths = [
-        "dslim/bert-large-NER",                     # ft on NER
-        "Jean-Baptiste/roberta-large-ner-english",  # ft on NER
-        "nlpaueb/legal-bert-base-uncased",          # ft on Legal Domain
-        "saibo/legal-roberta-base",                 # ft on Legal Domain
-        "nlpaueb/bert-base-uncased-eurlex",         # ft on Eurlex
-        "nlpaueb/bert-base-uncased-echr",           # ft on ECHR
-        "studio-ousia/luke-base",                   # LUKE base
-        "studio-ousia/luke-large",                  # LUKE large
-    ]
+        model_paths = [
+            "dslim/bert-large-NER",                     # ft on NER
+            "Jean-Baptiste/roberta-large-ner-english",  # ft on NER
+            "nlpaueb/legal-bert-base-uncased",          # ft on Legal Domain
+            "saibo/legal-roberta-base",                 # ft on Legal Domain
+            "nlpaueb/bert-base-uncased-eurlex",         # ft on Eurlex
+            "nlpaueb/bert-base-uncased-echr",           # ft on ECHR
+            "studio-ousia/luke-base",                   # LUKE base
+            "studio-ousia/luke-large",                  # LUKE large
+        ]
+    if args.models == "luke":
+        model_paths = [
+            "studio-ousia/luke-base",                   # LUKE base
+            "studio-ousia/luke-large",                  # LUKE large
+        ]          
 
     for model_path in model_paths:
 
