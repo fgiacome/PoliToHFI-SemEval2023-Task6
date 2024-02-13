@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from nervaluate import Evaluator
 
 from transformers import AutoModelForTokenClassification
-from transformers import Trainer, DefaultDataCollator, TrainingArguments
+from transformers import Trainer, DefaultDataCollator, DataCollatorForTokenClassification, TrainingArguments
 
 from utils.dataset import LegalNERTokenDataset
 
@@ -77,6 +77,13 @@ if __name__ == "__main__":
         required=False,
         type=float,
     )
+    parser.add_argument(
+        "--collator",
+        help="collator",
+        default="default",
+        required=False,
+        type=str,
+    )    
 
     args = parser.parse_args()
 
@@ -227,7 +234,10 @@ if __name__ == "__main__":
         )
 
         ## Collator
-        data_collator = DefaultDataCollator()
+        if args.collator == "default":
+            data_collator = DefaultDataCollator()
+        if args.collator == "fortokenclassification":
+            data_collator = DataCollatorForTokenClassification()
 
         ## Trainer
         trainer = Trainer(
