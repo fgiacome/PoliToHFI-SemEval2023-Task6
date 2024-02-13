@@ -77,13 +77,7 @@ if __name__ == "__main__":
         required=False,
         type=float,
     )
-    parser.add_argument(
-        "--collator",
-        help="collator",
-        default="default",
-        required=False,
-        type=str,
-    )
+
     parser.add_argument(
         "--models",
         help="all for all models, luke for just luke",
@@ -247,10 +241,7 @@ if __name__ == "__main__":
         )
 
         ## Collator
-        if args.collator == "default":
-            data_collator = DefaultDataCollator()
-        if args.collator == "fortokenclassification":
-            data_collator = DataCollatorForTokenClassification()
+        data_collator = DefaultDataCollator()
 
         ## Trainer
         trainer = Trainer(
