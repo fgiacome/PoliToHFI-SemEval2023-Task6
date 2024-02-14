@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from nervaluate import Evaluator
 
 from transformers import AutoModelForTokenClassification
-from transformers import Trainer, DefaultDataCollator, DataCollatorForTokenClassification, TrainingArguments
+from transformers import Trainer, DefaultDataCollator, TrainingArguments
 
 from utils.dataset import LegalNERTokenDataset
 
@@ -80,13 +80,14 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--models",
-        help="all for all models, luke for just luke",
+        help="all for all models, luke_b for just luke base, mluke_b for multilingual luke base",
         default="all",
         required=False,
         type=str,
     )     
 
     args = parser.parse_args()
+    print(args)
 
     ## Parameters
     ds_train_path = args.ds_train_path  # e.g., 'data/NER_TRAIN/NER_TRAIN_ALL.json'
@@ -159,23 +160,27 @@ if __name__ == "__main__":
             / (results["exact"]["precision"] + results["exact"]["recall"] + 1e-9),
         }
     
-    if args.models == "all":
     ## Define the models
+    model_paths = [
+        "dslim/bert-large-NER",                     # ft on NER
+        "Jean-Baptiste/roberta-large-ner-english",  # ft on NER
+        "nlpaueb/legal-bert-base-uncased",          # ft on Legal Domain
+        "saibo/legal-roberta-base",                 # ft on Legal Domain
+        "nlpaueb/bert-base-uncased-eurlex",         # ft on Eurlex
+        "nlpaueb/bert-base-uncased-echr",           # ft on ECHR
+        "studio-ousia/luke-base",                   # LUKE base
+        "studio-ousia/luke-large",                  # LUKE large
+        "studio-ousia/mluke-base"
+    ]
+    if args.models == "luke_b":
         model_paths = [
-            "dslim/bert-large-NER",                     # ft on NER
-            "Jean-Baptiste/roberta-large-ner-english",  # ft on NER
-            "nlpaueb/legal-bert-base-uncased",          # ft on Legal Domain
-            "saibo/legal-roberta-base",                 # ft on Legal Domain
-            "nlpaueb/bert-base-uncased-eurlex",         # ft on Eurlex
-            "nlpaueb/bert-base-uncased-echr",           # ft on ECHR
             "studio-ousia/luke-base",                   # LUKE base
-            "studio-ousia/luke-large",                  # LUKE large
-        ]
-    if args.models == "luke":
-        model_paths = [
-            "studio-ousia/luke-base",                   # LUKE base
-            "studio-ousia/luke-large",                  # LUKE large
         ]          
+    if args.models == "mluke_b":
+        model_paths = [
+            "studio-ousia/mluke-base"                   # mLUKE base
+        ]
+
 
     for model_path in model_paths:
 
