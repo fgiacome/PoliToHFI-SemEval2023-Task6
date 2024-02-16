@@ -8,6 +8,7 @@ from transformers import AutoModelForTokenClassification
 from transformers import Trainer, DefaultDataCollator, TrainingArguments
 
 from utils.dataset import LegalNERTokenDataset
+from utils.german_dataset import get_german_dataset, GERMAN_LABEL_LIST, GERMAN_IDX_TO_LABEL
 
 import spacy
 nlp = spacy.load("en_core_web_sm")
@@ -86,6 +87,14 @@ if __name__ == "__main__":
         type=str,
     )     
 
+    parser.add_argument(
+        "--dataset",
+        help="indian or german",
+        default="indian",
+        required=False,
+        type=str,
+    )     
+
     args = parser.parse_args()
     print(args)
 
@@ -100,25 +109,30 @@ if __name__ == "__main__":
     warmup_ratio = args.warmup_ratio    # e.g., 0.06
 
     ## Define the labels
-    original_label_list = [
-        "COURT",
-        "PETITIONER",
-        "RESPONDENT",
-        "JUDGE",
-        "DATE",
-        "ORG",
-        "GPE",
-        "STATUTE",
-        "PROVISION",
-        "PRECEDENT",
-        "CASE_NUMBER",
-        "WITNESS",
-        "OTHER_PERSON",
-        "LAWYER"
-    ]
-    labels_list = ["B-" + l for l in original_label_list]
-    labels_list += ["I-" + l for l in original_label_list]
+    if args.dataset == 'indian':
+        original_label_list = [
+            "COURT",
+            "PETITIONER",
+            "RESPONDENT",
+            "JUDGE",
+            "DATE",
+            "ORG",
+            "GPE",
+            "STATUTE",
+            "PROVISION",
+            "PRECEDENT",
+            "CASE_NUMBER",
+            "WITNESS",
+            "OTHER_PERSON",
+            "LAWYER"
+        ]
+        labels_list = ["B-" + l for l in original_label_list]
+        labels_list += ["I-" + l for l in original_label_list]
+    if args.dataset == 'german':
+        labels_list = GERMAN_LABEL_LIST
+        labels_list.remove('O')
     num_labels = len(labels_list) + 1
+
 
     ## Compute metrics
     def compute_metrics(pred):
@@ -190,22 +204,31 @@ if __name__ == "__main__":
         use_roberta = False
         if "luke" in model_path or "roberta" in model_path:
             use_roberta = True
+        
+        if args.dataset == "indian":
+            train_ds = LegalNERTokenDataset(
+                ds_train_path, 
+                model_path, 
+                labels_list=labels_list, 
+                split="train", 
+                use_roberta=use_roberta
+            )
 
-        train_ds = LegalNERTokenDataset(
-            ds_train_path, 
-            model_path, 
-            labels_list=labels_list, 
-            split="train", 
-            use_roberta=use_roberta
-        )
-
-        val_ds = LegalNERTokenDataset(
-            ds_valid_path, 
-            model_path, 
-            labels_list=labels_list, 
-            split="val", 
-            use_roberta=use_roberta
-        )
+            val_ds = LegalNERTokenDataset(
+                ds_valid_path, 
+                model_path, 
+                labels_list=labels_list, 
+                split="val", 
+                use_roberta=use_roberta
+            )
+            ## Map the labels
+            idx_to_labels = {v[1]: v[0] for v in train_ds.labels_to_idx.items()}
+        
+        if args.dataset == 'german':
+            assert args.models == "mluke_b", "The German dataset is not set up to train with models other than mLUKE."
+            train_ds = get_german_dataset('train')
+            val_ds = get_german_dataset('validation')
+            idx_to_labels = GERMAN_IDX_TO_LABEL
 
         ## Define the model
         model = AutoModelForTokenClassification.from_pretrained(
@@ -214,8 +237,6 @@ if __name__ == "__main__":
             ignore_mismatched_sizes=True
         )
 
-        ## Map the labels
-        idx_to_labels = {v[1]: v[0] for v in train_ds.labels_to_idx.items()}
 
         ## Output folder
         new_output_folder = os.path.join(output_folder, 'all')

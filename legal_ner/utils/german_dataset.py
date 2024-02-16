@@ -1,7 +1,6 @@
 from datasets import load_dataset
 from torch.utils.data import Dataset
 from transformers import XLMRobertaTokenizerFast
-import torch
 
 GERMAN_LABEL_LIST = [
     "B-AN",
@@ -48,7 +47,7 @@ GERMAN_LABEL_LIST = [
 GERMAN_LABEL_TO_IDX = {l: i for i, l in enumerate(GERMAN_LABEL_LIST)}
 GERMAN_IDX_TO_LABEL = {i: l for i, l in enumerate(GERMAN_LABEL_LIST)}
 # this contains the NER tags without the B or I
-GERMAN_PURE_LABEL_LIST = [GERMAN_LABEL_LIST[l[2:]] for l in range(19)] + ["O"]
+GERMAN_PURE_LABEL_LIST = [GERMAN_LABEL_LIST[l][2:] for l in range(19)] + ["O"]
 
 # tokenizer will be initialized later, but it is declared as
 # a global variable for easy access by the `tokenize` function
