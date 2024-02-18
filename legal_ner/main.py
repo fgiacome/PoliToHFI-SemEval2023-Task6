@@ -194,7 +194,14 @@ if __name__ == "__main__":
         model_paths = [
             "studio-ousia/mluke-base"                   # mLUKE base
         ]
-
+    if args.models == "ernie_b":
+        model_paths = [
+            "nghuyong/ernie-2.0-base-en"                   # ERNIE base
+        ]
+    if args.models == "bert":
+        model_paths = [
+            "docs/transformers/model_doc/bert"                   # BERT original
+        ]
 
     for model_path in model_paths:
 
