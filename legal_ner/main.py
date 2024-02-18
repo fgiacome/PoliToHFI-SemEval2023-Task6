@@ -200,7 +200,7 @@ if __name__ == "__main__":
         ]
     if args.models == "bert":
         model_paths = [
-            "docs/transformers/model_doc/bert"                   # BERT original
+            "bert-base-uncased"                   # BERT original
         ]
 
     for model_path in model_paths:
