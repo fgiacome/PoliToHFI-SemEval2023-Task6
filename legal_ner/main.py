@@ -223,12 +223,14 @@ if __name__ == "__main__":
             )
             ## Map the labels
             idx_to_labels = {v[1]: v[0] for v in train_ds.labels_to_idx.items()}
+            max_steps = -1
         
         if args.dataset == 'german':
             assert args.models == "mluke_b", "The German dataset is not set up to train with models other than mLUKE."
             train_ds = get_german_dataset('train')
             val_ds = get_german_dataset('validation')
             idx_to_labels = GERMAN_IDX_TO_LABEL
+            max_steps = num_epochs*53_383
 
         ## Define the model
         model = AutoModelForTokenClassification.from_pretrained(
@@ -264,6 +266,7 @@ if __name__ == "__main__":
             metric_for_best_model="f1-strict",
             dataloader_num_workers=4,
             dataloader_pin_memory=True,
+            max_steps=max_steps
         )
 
         ## Collator

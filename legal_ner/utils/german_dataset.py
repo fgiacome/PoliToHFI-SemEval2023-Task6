@@ -98,6 +98,6 @@ def get_german_dataset(split="train"):
     tokenizer = XLMRobertaTokenizerFast.from_pretrained(
         "xlm-roberta-base", add_prefix_space=True
     )
-    dataset: datasets.IterableDataset = load_dataset("elenanereiss/german-ler", split=split, streaming=True)
+    dataset: datasets.IterableDataset = load_dataset("elenanereiss/german-ler", split=split).to_iterable_dataset(128)
     dataset = dataset.map(tokenize, batched=False, remove_columns=["id", "tokens", "ner_tags", "ner_coarse_tags"])
     return dataset
