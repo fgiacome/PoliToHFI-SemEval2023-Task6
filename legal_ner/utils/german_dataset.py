@@ -1,3 +1,4 @@
+import datasets
 from datasets import load_dataset
 from torch.utils.data import Dataset
 from transformers import XLMRobertaTokenizerFast
@@ -97,7 +98,6 @@ def get_german_dataset(split="train"):
     tokenizer = XLMRobertaTokenizerFast.from_pretrained(
         "xlm-roberta-base", add_prefix_space=True
     )
-    dataset = load_dataset("elenanereiss/german-ler", split=split)
-    dataset = dataset.map(tokenize, batched=False)
-    dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
+    dataset: datasets.IterableDataset = load_dataset("elenanereiss/german-ler", split=split, streaming=True)
+    dataset = dataset.map(tokenize, batched=False, remove_columns=["id", "tokens", "ner_tags", "ner_coarse_tags"])
     return dataset
