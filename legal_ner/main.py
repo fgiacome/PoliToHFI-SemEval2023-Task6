@@ -230,7 +230,7 @@ if __name__ == "__main__":
             train_ds = get_german_dataset('train')
             val_ds = get_german_dataset('validation')
             idx_to_labels = GERMAN_IDX_TO_LABEL
-            max_steps = num_epochs*53_383
+            max_steps = -1
 
         ## Define the model
         model = AutoModelForTokenClassification.from_pretrained(
