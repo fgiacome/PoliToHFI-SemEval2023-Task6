@@ -97,6 +97,14 @@ if __name__ == "__main__":
         type=str,
     )     
 
+    parser.add_argument(
+        "--eval_steps",
+        help="eval steps (-1 for epoch)",
+        default=-1,
+        required=False,
+        type=int,
+    )
+
     args = parser.parse_args()
     print(args)
 
@@ -152,7 +160,7 @@ if __name__ == "__main__":
         labels = np.concatenate(labels, axis=0)
         labels_ids = [[idx_to_labels[p] if p != -100 else "O" for p in labels]]
         unique_labels = list(set([l.split("-")[-1] for l in list(set(labels_ids[0]))]))
-        unique_labels.remove("O")
+        if "O" in unique_labels: unique_labels.remove("O")
 
         # Evaluator
         evaluator = Evaluator(
@@ -263,6 +271,8 @@ if __name__ == "__main__":
             os.makedirs(new_output_folder)
 
         ## Training Arguments
+        evaluation_strategy = "epoch" if args.eval_steps < 0 else "steps"
+        eval_steps = None if args.eval_steps < 0 else args.eval_steps
         training_args = TrainingArguments(
             output_dir=new_output_folder,
             num_train_epochs=num_epochs,
@@ -273,7 +283,7 @@ if __name__ == "__main__":
             gradient_checkpointing=True,
             warmup_ratio=warmup_ratio,
             weight_decay=weight_decay,
-            evaluation_strategy="epoch",
+            evaluation_strategy=evaluation_strategy,
             save_strategy="epoch",
             load_best_model_at_end=False,
             save_total_limit=2,
@@ -282,7 +292,8 @@ if __name__ == "__main__":
             metric_for_best_model="f1-strict",
             dataloader_num_workers=4,
             dataloader_pin_memory=True,
-            max_steps=max_steps
+            max_steps=max_steps,
+            eval_steps=eval_steps
         )
 
         ## Collator
