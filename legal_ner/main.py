@@ -347,7 +347,9 @@ if __name__ == "__main__":
         trainer.save_model(output_folder)
         trainer.evaluate()
         if args.ds_test_path:
-            trainer.evaluate(test_ds)
+            predictions = trainer.predict(test_ds)
+            metrics = compute_metrics(predictions)
+            print(metrics)
 
 
 
