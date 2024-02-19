@@ -186,6 +186,11 @@ if __name__ == "__main__":
         "studio-ousia/luke-large",                  # LUKE large
         "studio-ousia/mluke-base"
     ]
+    if args.models == "roberta":
+        model_paths = [
+            "roberta-base"                   # roBERTa base original
+        ]
+
     if args.models == "luke_b":
         model_paths = [
             "studio-ousia/luke-base",                   # LUKE base
@@ -194,14 +199,6 @@ if __name__ == "__main__":
         model_paths = [
             "studio-ousia/mluke-base"                   # mLUKE base
         ]
-    if args.models == "ernie_b":
-        model_paths = [
-            "nghuyong/ernie-2.0-base-en"                   # ERNIE base
-        ]
-    if args.models == "bert":
-        model_paths = [
-            "bert-base-uncased"                   # BERT original
-        ]
 
     for model_path in model_paths:
 
@@ -209,7 +206,7 @@ if __name__ == "__main__":
 
         ## Define the train and test datasets
         use_roberta = False
-        if "luke" in model_path or "roberta" or "ernie" in model_path:
+        if "luke" in model_path or "roberta" in model_path:
             use_roberta = True
         
         if args.dataset == "indian":
