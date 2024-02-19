@@ -252,7 +252,7 @@ if __name__ == "__main__":
         if args.dataset == 'combined':
             assert args.models == "mluke_b", "The combined dataset is not set up to train with models other than mLUKE."
             train_ds = get_combined_dataset(ds_train_path, "train", "train", 1.0, 502124)
-            val_ds = get_german_dataset('validation')
+            val_ds = get_combined_dataset(ds_valid_path, "val", "validation", 1.0, 183099)
             idx_to_labels = conversion.COMMON_IDX_TO_LABEL
             max_steps = -1
 
