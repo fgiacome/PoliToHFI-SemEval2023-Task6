@@ -9,6 +9,35 @@ from utils.utils import match_labels
 import spacy
 nlp = spacy.load("en_core_web_sm")
 
+INDIAN_LABELS = ['B-COURT',
+ 'B-PETITIONER',
+ 'B-RESPONDENT',
+ 'B-JUDGE',
+ 'B-DATE',
+ 'B-ORG',
+ 'B-GPE',
+ 'B-STATUTE',
+ 'B-PROVISION',
+ 'B-PRECEDENT',
+ 'B-CASE_NUMBER',
+ 'B-WITNESS',
+ 'B-OTHER_PERSON',
+ 'B-LAWYER',
+ 'I-COURT',
+ 'I-PETITIONER',
+ 'I-RESPONDENT',
+ 'I-JUDGE',
+ 'I-DATE',
+ 'I-ORG',
+ 'I-GPE',
+ 'I-STATUTE',
+ 'I-PROVISION',
+ 'I-PRECEDENT',
+ 'I-CASE_NUMBER',
+ 'I-WITNESS',
+ 'I-OTHER_PERSON',
+ 'I-LAWYER']
+
 ############################################################
 #                                                          #
 #                      DATASET CLASS                       #

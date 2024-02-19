@@ -9,6 +9,8 @@ from transformers import Trainer, DefaultDataCollator, TrainingArguments
 
 from utils.dataset import LegalNERTokenDataset
 from utils.german_dataset import get_german_dataset, GERMAN_LABEL_LIST, GERMAN_IDX_TO_LABEL
+from utils.combined_datasets import get_combined_dataset
+from utils import conversion
 
 import spacy
 nlp = spacy.load("en_core_web_sm")
@@ -89,7 +91,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--dataset",
-        help="indian or german",
+        help="indian, german, combined",
         default="indian",
         required=False,
         type=str,
@@ -130,6 +132,9 @@ if __name__ == "__main__":
         labels_list += ["I-" + l for l in original_label_list]
     if args.dataset == 'german':
         labels_list = GERMAN_LABEL_LIST
+        labels_list.remove('O')
+    if args.dataset == 'combined':
+        labels_list = conversion.COMMON_LABELS
         labels_list.remove('O')
     num_labels = len(labels_list) + 1
 
@@ -234,6 +239,13 @@ if __name__ == "__main__":
             train_ds = get_german_dataset('train')
             val_ds = get_german_dataset('validation')
             idx_to_labels = GERMAN_IDX_TO_LABEL
+            max_steps = -1
+        
+        if args.dataset == 'combined':
+            assert args.models == "mluke_b", "The combined dataset is not set up to train with models other than mLUKE."
+            train_ds = get_combined_dataset(ds_train_path, "train", "train", 1.0, 502124)
+            val_ds = get_german_dataset('validation')
+            idx_to_labels = conversion.COMMON_IDX_TO_LABEL
             max_steps = -1
 
         ## Define the model
