@@ -245,6 +245,14 @@ if __name__ == "__main__":
                 split="val", 
                 use_roberta=use_roberta
             )
+            #try if work on trainer.evaluate(test_ds)
+            test_ds = LegalNERTokenDataset(
+                args.ds_test_path, 
+                model_path, 
+                labels_list=labels_list, 
+                split="val", 
+                use_roberta=use_roberta
+            )
 
             ## Map the labels
             idx_to_labels = {v[1]: v[0] for v in train_ds.labels_to_idx.items()}
@@ -338,8 +346,8 @@ if __name__ == "__main__":
         trainer.train()
         trainer.save_model(output_folder)
         trainer.evaluate()
-
-        trainer.evaluate(test_ds)
+        if args.ds_test_path:
+            trainer.evaluate(test_ds)
 
 
 
