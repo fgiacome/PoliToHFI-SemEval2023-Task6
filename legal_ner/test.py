@@ -49,11 +49,11 @@ def test(model_path, test_data_path, dataset, label_type, output_dir):
         indian_original_labels: LegalNERTokenDataset = LegalNERTokenDataset(
             test_data_path, model_path, INDIAN_LABELS, split="test", use_roberta=True
         )
-        indian_original_labels = Dataset.from_list(indian_original_labels)
+        indian_original_labels_hf = Dataset.from_list(indian_original_labels)
         if label_type == "original":
-            test_ds = indian_original_labels
+            test_ds = indian_original_labels_hf
         if label_type == "combined":
-            test_ds = indian_original_labels.map(
+            test_ds = indian_original_labels_hf.map(
                 lambda s: {
                     "labels": [conversion.INDIAN_TO_COMMON[i] for i in s["labels"]]
                 }
