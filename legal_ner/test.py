@@ -5,6 +5,7 @@ from utils.dataset import INDIAN_LABELS
 from utils.german_dataset import get_german_dataset
 from utils import conversion
 from datasets import Dataset
+import json
 
 def test(model_path, test_data_path, dataset, label_type):
     assert dataset=='german' or (test_data_path is not None), 'Please indicate a test_data_path for the indian dataset if not using German only.'
@@ -46,7 +47,7 @@ def test(model_path, test_data_path, dataset, label_type):
     print("Testing...")
     predictions = trainer.predict(test_ds)
     metrics = compute_metrics(predictions)
-    print(metrics)
+    return metrics
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test NER model")
@@ -54,6 +55,12 @@ if __name__ == "__main__":
     parser.add_argument("--test_data_path", help="Path to the test dataset (Indian dataset only)", required=False, type=str, default=None)
     parser.add_argument("--dataset", help="'german', 'indian', 'combined'", required=True)
     parser.add_argument("--label_type", help="'original' or 'combined'", required=True)
+    parser.add_argument("--save_results_path", type=str, default=None, required=True)
     args = parser.parse_args()
 
-    test(args.model_path, args.test_data_path, args.dataset, args.label_type)
+    metrics = test(args.model_path, args.test_data_path, args.dataset, args.label_type)
+    
+    print(metrics)
+    if args.save_results_path is not None:
+        with open(args.save_results_path, 'w') as fp:
+            json.dump(metrics, fp)
