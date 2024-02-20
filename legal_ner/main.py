@@ -39,12 +39,6 @@ if __name__ == "__main__":
         type=str,
     )
     parser.add_argument(
-        "--ds_test_path",
-        help="Path of test dataset file",
-        required=False,
-        type=str,
-    )
-    parser.add_argument(
         "--output_folder",
         help="Output folder",
         default="results/",
@@ -117,7 +111,6 @@ if __name__ == "__main__":
     ## Parameters
     ds_train_path = args.ds_train_path  # e.g., 'data/NER_TRAIN/NER_TRAIN_ALL.json'
     ds_valid_path = args.ds_valid_path  # e.g., 'data/NER_DEV/NER_DEV_ALL.json'
-
     output_folder = args.output_folder  # e.g., 'results/'
     batch_size = args.batch             # e.g., 256 for luke-based, 1 for bert-based
     num_epochs = args.num_epochs        # e.g., 5
@@ -245,15 +238,6 @@ if __name__ == "__main__":
                 split="val", 
                 use_roberta=use_roberta
             )
-            if args.ds_test_path:
-                test_ds = LegalNERTokenDataset(
-                    args.ds_test_path, 
-                    model_path, 
-                    labels_list=labels_list, 
-                    split="val", 
-                    use_roberta=use_roberta
-                )
-
             ## Map the labels
             idx_to_labels = {v[1]: v[0] for v in train_ds.labels_to_idx.items()}
             max_steps = -1
@@ -272,30 +256,13 @@ if __name__ == "__main__":
             idx_to_labels = conversion.COMMON_IDX_TO_LABEL
             max_steps = -1
 
-            #combined also test in german and indian
-            if args.ds_test_path:
-                if "german" in args.ds_test_path:
-                    test_ds = get_german_dataset('validation')
-                    idx_to_labels = conversion.COMMON_IDX_TO_LABEL
-                    max_steps = -1
-                else:
-                    test_ds = LegalNERTokenDataset(
-                        args.ds_test_path, 
-                        model_path, 
-                        labels_list=labels_list, 
-                        split="val", 
-                        use_roberta=use_roberta
-                    )
-                    idx_to_labels = conversion.COMMON_IDX_TO_LABEL
-                    max_steps = -1
-
-
         ## Define the model
         model = AutoModelForTokenClassification.from_pretrained(
             model_path, 
             num_labels=num_labels, 
             ignore_mismatched_sizes=True
         )
+
 
         ## Output folder
         new_output_folder = os.path.join(output_folder, 'all')
@@ -346,11 +313,6 @@ if __name__ == "__main__":
         trainer.train()
         trainer.save_model(output_folder)
         trainer.evaluate()
-        if args.ds_test_path:
-            print("test start")
-            predictions = trainer.predict(test_ds)
-            metrics = compute_metrics(predictions)
-            print(metrics)
 
 
 
