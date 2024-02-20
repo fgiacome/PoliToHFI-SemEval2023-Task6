@@ -9,7 +9,7 @@ import json, numpy as np
 from nervaluate import Evaluator
 
 
-def test(model_path, test_data_path, dataset, label_type):
+def test(model_path, test_data_path, dataset, label_type, output_dir):
     def compute_metrics(pred):
 
         # Preds
@@ -77,6 +77,7 @@ def test(model_path, test_data_path, dataset, label_type):
 
     # set Trainer
     training_args = TrainingArguments(
+        output_dir,
         dataloader_num_workers=4,
         dataloader_pin_memory=True,
     )
@@ -107,9 +108,18 @@ if __name__ == "__main__":
     )
     parser.add_argument("--label_type", help="'original' or 'combined'", required=True)
     parser.add_argument("--save_results_path", type=str, default=None, required=True)
+    parser.add_argument(
+        "--output_dir", help="passed to trainer for evaluation", required=True
+    )
     args = parser.parse_args()
 
-    metrics = test(args.model_path, args.test_data_path, args.dataset, args.label_type)
+    metrics = test(
+        args.model_path,
+        args.test_data_path,
+        args.dataset,
+        args.label_type,
+        args.output_dir,
+    )
 
     print(metrics)
     if args.save_results_path is not None:
